@@ -14,7 +14,8 @@ int main() {
   for (size_t ii = 0; ii < 6; ++ii)
     y[ii] = rv[ii] + wn[ii];
   
-  Filter kf(rv);
+  Filter kf(0.0, rv);
   GPSScalarUpdate(kf, y);
-  
+
+  return 0;
 }

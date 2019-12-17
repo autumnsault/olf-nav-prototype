@@ -25,7 +25,7 @@ public:
 
     // 2. Compute the measurement sensitivity matrix H.
     MeasSens H_now = MeasSens::Zero();
-    for (meas_size_t ii = 0; ii < 6; ++ii)
+    for (size_t ii = 0; ii < 6; ++ii)
       H_now(ii,ii) = 1.0;
     
     H = H_now * kf.Phi; // FIXME: Need to use a Phi which is properly

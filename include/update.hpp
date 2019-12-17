@@ -5,20 +5,21 @@
 
 #include <Eigen/Dense>
 
+using Eigen::Matrix;
+using Eigen::DiagonalMatrix;
+
 #include "filter.hpp"
 
-typedef unsigned short              meas_size_t;
 
-
-template <meas_size_t MM>
+template <size_t MM>
 class Update {
 public:
-  Update(Filter& kf, const Eigen::Matrix<double,MM,1>& y)
+  Update(Filter& kf, const Matrix<double,MM,1>& y)
     : z2(0.0)
     , pass(true)
   {}
 
-  virtual void apply(Filter& kf, const Eigen::Matrix<double,MM,1>& y,
+  virtual void apply(Filter& kf, const Matrix<double,MM,1>& y,
 		     float z2_max = 16.0) = 0;
 
   float z2;  /* (--) square of z-score, which is Mahalanobis distance
@@ -27,26 +28,26 @@ public:
 };
 
 
-template <meas_size_t MM>
+template <size_t MM>
 class ScalarUpdate : public Update<MM> {
 public:
-  typedef Eigen::Matrix<double,MM,1> Meas;
-  typedef Eigen::Matrix<double,1,MM> MeasT;
-  typedef Eigen::DiagonalMatrix<double,MM> MeasCov;
-  typedef Eigen::Matrix<double,MM,NN> MeasSens;
-  typedef Eigen::Matrix<double,NN,MM> MeasSensT;
+  typedef Matrix<double,MM,1> Meas;
+  typedef Matrix<double,1,MM> MeasT;
+  typedef DiagonalMatrix<double,MM> MeasCov;
+  typedef Matrix<double,MM,NN> MeasSens;
+  typedef Matrix<double,NN,MM> MeasSensT;
   
-  ScalarUpdate(Filter& kf, const Eigen::Matrix<double,MM,1>& y)
+  ScalarUpdate(Filter& kf, const Matrix<double,MM,1>& y)
     : Update<MM>::Update(kf, y)
   {}
 
-  void apply(Filter& kf, const Eigen::Matrix<double,MM,1>& y,
+  void apply(Filter& kf, const Matrix<double,MM,1>& y,
 		     float z2_max = 16.0)
   {
     MeasSensT PHt;
     // 3. Perform residual edit check. Perform underweighting if
     //    needed.
-    for (meas_size_t kk = 0; Update<MM>::pass && kk < MM; ++kk) {
+    for (size_t kk = 0; Update<MM>::pass && kk < MM; ++kk) {
       StateT Hk = H.row(kk);
       PHt.col(kk) = kf.P * Hk.transpose();
       W.diagonal()(kk) = Hk * PHt.col(kk);
@@ -69,7 +70,7 @@ public:
     }
 
     if (Update<MM>::pass) {
-      for (meas_size_t kk = 0; kk < MM; ++kk) {
+      for (size_t kk = 0; kk < MM; ++kk) {
 	double w = W.diagonal()[kk];
 	
 	// Compute Kalman gain column kk
@@ -78,8 +79,8 @@ public:
 	kf.dX += K * dy[kk];
 	dx    += K * dy[kk]; // local copy just from this update
 	
-	for (meas_size_t ii = 0; ii < NN; ++ii) {
-	  for (meas_size_t jj = ii; jj < NN; ++jj) {
+	for (size_t ii = 0; ii < NN; ++ii) {
+	  for (size_t jj = ii; jj < NN; ++jj) {
 	    kf.P(ii,jj) = kf.P(ii,jj) - K[ii] * PHt(jj,kk)
 	                              - K[jj] * PHt(ii,kk)
 	                              + K[ii] * K[jj] * w;
