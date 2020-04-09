@@ -1,6 +1,6 @@
 # nav
 
-Navigation filter for Lunar missions
+Prototype navigation filter for Lunar missions
 
 * [Open Lunar Foundation](https://www.openlunar.org/)
 
@@ -35,7 +35,7 @@ If you find a bug or wish to make a contribution, use the project's
 
 ## License
 
-Copyright (c) 2019--2020, Open Lunar Foundation.
+Copyright (c) 2019--2020, John O. "Juno" Woods and Open Lunar Foundation.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
